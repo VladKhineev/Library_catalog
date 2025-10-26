@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 import src.models as models
+from src.bookManager import BookManager
 
 app = FastAPI()
 
@@ -20,7 +21,8 @@ def get_book(book_id: int):
 
 @app.post('/')
 def add_book(book: models.Book):
-    return book
+    BookManager.add_book(book)
+    return '200'
 
 @app.patch('/')
 def update_book(book: models.Book):
