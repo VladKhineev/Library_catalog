@@ -1,0 +1,79 @@
+import json
+import os
+
+import src.models as models
+
+
+class JsonBookManager:
+    def __init__(self):
+        self.repo = JSONRepository('books.json')
+
+    def get_books(self) -> list[dict]:
+        return self.repo.load_data()
+
+    def get_book(self, book_id: int) -> dict:
+        books: list[dict] = self.get_books()
+        res = {}
+        for book in books:
+            if book_id == book['id']:
+                res = book
+        return res
+
+    def add_book(self, book: models.Book) -> models.Book:
+        books: list[dict] = self.get_books()
+        books.append(book.model_dump())
+        self.repo.save_data(books)
+        return book
+
+    def update_book(self, new_book: models.Book) -> models.Book:
+        self.delete_book(new_book.id)
+        self.add_book(new_book)
+        return new_book
+
+    def delete_book(self, book_id: int) -> models.Book:
+        books: list[dict] = self.get_books()
+        res = {}
+        for i, book in enumerate(books):
+            if book_id == book['id']:
+                res = books.pop(i)
+        self.repo.save_data(books)
+
+        return models.Book(**res)
+
+
+class JSONRepository:
+    def __init__(self, filename: str):
+        self.filename = filename
+
+    def save_data(self, data: list[dict]):
+        with open(self.filename, "w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+
+    def load_data(self) -> list[dict]:
+        if os.path.exists(self.filename):
+            with open(self.filename, "r", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+        else:
+            data = []
+
+        return data
+
+
+
+
+if __name__ == '__main__':
+    bm = JsonBookManager()
+    book = models.Book(**{
+      "id": 2,
+      "title": "string",
+      "autor": "string",
+      "year": 1,
+      "genre": "string",
+      "count_page": 0,
+      "accessibility": "в наличии"
+    })
+
+    print(bm.update_book(book))
