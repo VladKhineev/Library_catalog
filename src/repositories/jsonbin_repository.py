@@ -7,7 +7,7 @@ from fastapi_cloud_cli.utils.cli import handle_http_errors
 
 import src.models as models
 
-class JsonBin:
+class JsonBinRepository:
     """
     Класс для работы с API JSONBin.io (CRUD)
     """
@@ -84,5 +84,5 @@ if __name__ == '__main__':
         "accessibility": "в наличии"
     })
 
-    js = JsonBin('$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O', '69008a2a43b1c97be986cdc7')
+    js = JsonBinRepository('$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O', '69008a2a43b1c97be986cdc7')
     print(js.update_book(book))

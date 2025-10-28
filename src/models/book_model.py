@@ -14,3 +14,4 @@ class Book(BaseModel):
     genre: str
     count_page: int
     accessibility: AvailabilityStatus
+

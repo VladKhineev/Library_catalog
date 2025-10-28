@@ -4,9 +4,9 @@ import os
 import src.models as models
 
 
-class JsonBookManager:
+class JsonBookRepository:
     def __init__(self):
-        self.repo = JSONRepository('books.json')
+        self.repo = JSONRepository('../books.json')
 
     def get_books(self) -> list[dict]:
         return self.repo.load_data()
