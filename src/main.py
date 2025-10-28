@@ -1,31 +1,32 @@
 from fastapi import FastAPI
 
 import src.models as models
+from src.book_manager import BookManager
 
 app = FastAPI()
 
-# get_books: получение списка всех книг с возможностью фильтрации
-# get_book: получение информации о конкретной книге
-# add_book: добавление новой книги в каталог
-# update_book: обновление информации о книге
-# delete_book: удаление книги из каталога
 
 @app.get('/get_books')
-def get_books():
-    return '200'
+def get_books(repo: str):
+    bm = BookManager(repo)
+    return bm.get_books()
 
 @app.get('/get_book/{book_id}')
-def get_book(book_id: int):
-    return book_id
+def get_book(repo: str, book_id: int):
+    bm = BookManager(repo)
+    return bm.get_book(book_id)
 
 @app.post('/')
-def add_book(book: models.Book):
-    return book
+def add_book(repo: str, book: models.Book):
+    bm = BookManager(repo)
+    return bm.add_book(book)
 
-@app.patch('/')
-def update_book(book: models.Book):
-    return book
+@app.put('/')
+def update_book(repo: str, book_id: int, book: models.Book):
+    bm = BookManager(repo)
+    return bm.update_book(book_id, book)
 
 @app.delete('/{book_id}')
-def delete_book(book_id: int):
-    return book_id
+def delete_book(repo: str, book_id: int):
+    bm = BookManager(repo)
+    return bm.delete_book(book_id)
