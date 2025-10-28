@@ -3,6 +3,7 @@ from operator import index
 import src.models as models
 from src.db_manager import DBBookRepository
 from src.json_manager import JsonBookManager
+from src.jsonbin_repository import JsonBin
 
 
 class BookManager:
@@ -11,6 +12,8 @@ class BookManager:
             self.repository = DBBookRepository('postgresql://postgres:postgres@localhost:5432/Library')
         elif index_repository == 'json':
             self.repository = JsonBookManager()
+        elif index_repository == 'bin':
+            self.repository = JsonBin('$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O', '69008a2a43b1c97be986cdc7')
 
     def add_book(self, book: models.Book):
         return self.repository.add_book(book)
@@ -37,5 +40,5 @@ if __name__ == '__main__':
         "count_page": 1000000000,
         "accessibility": "в наличии"
     })
-    bm = BookManager('json')
+    bm = BookManager('bin')
     print(bm.get_books())
