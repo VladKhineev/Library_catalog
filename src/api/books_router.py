@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends
 from src.Core import config
 
 from src.managers.book_manager import BookManager
+from src.managers.enrichment_manager import BookEnrichmentManager
+
 from src.models.book_model import Book
 from src.models.repo_model import Repo
 
@@ -10,9 +12,11 @@ from src.repositories.db_repository import DBBookRepository
 from src.repositories.json_repository import JsonBookRepository
 from src.repositories.jsonbin_repository import JsonBinRepository
 
+from src.integrations.openlibrary_api import OpenLibraryAPI
+
 router = APIRouter(prefix='/books', tags=['Books'])
 
-def get_book_manager(source: Repo):
+def choose_repository(source: Repo):
     if source == Repo.POSTGRES:
         repo = DBBookRepository(dns=config.POSTGRES_URL)
     elif source == Repo.JSON:
@@ -21,7 +25,17 @@ def get_book_manager(source: Repo):
         repo = JsonBinRepository(master_key=config.MASTER_KEY, bin_id=config.BIN_ID)
     else:
         raise ValueError("Unknown source")
+    return repo
+
+def get_book_manager(source: Repo):
+    repo = choose_repository(source)
     return BookManager(repo)
+
+
+def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:
+    manager = get_book_manager(source)
+    api = OpenLibraryAPI()
+    return BookEnrichmentManager(manager, api)
 
 @router.get('/')
 def get_books(manager: BookManager = Depends(get_book_manager)):
@@ -43,3 +57,7 @@ def update_book(book: Book, manager: BookManager = Depends(get_book_manager)):
 @router.delete('/{book_id}')
 def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)):
     return manager.delete_book(book_id)
+
+@router.post('/enriched/')
+def create_book_enriched(book: Book, manager: BookEnrichmentManager = Depends(get_enrichment_manager)):
+    return manager.add_with_api(book)

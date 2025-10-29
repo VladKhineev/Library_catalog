@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor, RealDictRow
 
-from src.models.book_model import Book
+from src.models.book_model import Book, BookExternalInfo
 from src.repositories.base_repository import BaseBookRepository
 
 
@@ -21,13 +21,21 @@ class DBBookRepository(BaseBookRepository):
             year INT,
             genre VARCHAR(100),
             count_page INT DEFAULT 0,
-            accessibility VARCHAR(50) DEFAULT 'в наличии'
+            accessibility VARCHAR(50) DEFAULT 'в наличии',
+            external JSONB
         );
         '''
         with self._get_connection() as conn, conn.cursor() as cur:
             cur.execute(query)
             conn.commit()
 
+    def drope_table(self):
+        query = '''
+        DROP TABLE books;
+        '''
+        with self._get_connection() as conn, conn.cursor() as cur:
+            cur.execute(query)
+            conn.commit()
     #------------------------CRUD-----------------------------#
 
 
@@ -41,8 +49,8 @@ class DBBookRepository(BaseBookRepository):
 
     def add_book(self, book):
         query = """
-                INSERT INTO books (title, author, year, genre, count_page, accessibility)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO books (title, author, year, genre, count_page, accessibility, external)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING id;
                 """
         with self._get_connection() as conn, conn.cursor() as cur:
@@ -52,7 +60,8 @@ class DBBookRepository(BaseBookRepository):
                 book.year,
                 book.genre,
                 book.count_page,
-                book.accessibility
+                book.accessibility,
+                book.external.model_dump_json(),
             ))
             book_id = cur.fetchone()[0]
             conn.commit()
@@ -73,7 +82,8 @@ class DBBookRepository(BaseBookRepository):
                     year = %s,
                     genre = %s,
                     count_page = %s,
-                    accessibility = %s
+                    accessibility = %s,
+                    external = %s
                 WHERE id = %s;
                 """
         with self._get_connection() as conn, conn.cursor() as cur:
@@ -84,7 +94,8 @@ class DBBookRepository(BaseBookRepository):
                 new_book.genre,
                 new_book.count_page,
                 new_book.accessibility,
-                new_book.id
+                new_book.external.model_dump_json(),
+                new_book.id,
             ))
             conn.commit()
 
@@ -103,14 +114,15 @@ class DBBookRepository(BaseBookRepository):
 if __name__ == '__main__':
     repo = DBBookRepository('postgresql://postgres:postgres@localhost:5432/Library')
     # repo.create_table()
+    # repo.drope_table()
 
-    book = Book(**{
-        "id": 5,
-        "title": "Dima",
-        "author": "string",
-        "year": 0,
-        "genre": "string",
-        "count_page": 100,
-        "accessibility": "в наличии"
-    })
-    print(repo.delete_book(5))
+    # book = Book(**{
+    #     "id": 5,
+    #     "title": "Dima",
+    #     "author": "string",
+    #     "year": 0,
+    #     "genre": "string",
+    #     "count_page": 100,
+    #     "accessibility": "в наличии"
+    # })
+    # print(repo.delete_book(5))
