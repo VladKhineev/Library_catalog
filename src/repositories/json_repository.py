@@ -1,44 +1,46 @@
 import json
 import os
 
-import src.models as models
+from src.models.book_model import Book
+from src.repositories.base_repository import BaseBookRepository
 
 
-class JsonBookManager:
+class JsonBookRepository(BaseBookRepository):
     def __init__(self):
-        self.repo = JSONRepository('books.json')
+        self.repo = JSONRepository('../books.json')
 
     def get_books(self) -> list[dict]:
-        return self.repo.load_data()
-
-    def get_book(self, book_id: int) -> dict:
-        books: list[dict] = self.get_books()
-        res = {}
-        for book in books:
-            if book_id == book['id']:
-                res = book
+        res = self.repo.load_data()
         return res
 
-    def add_book(self, book: models.Book) -> models.Book:
+    def add_book(self, book):
         books: list[dict] = self.get_books()
         books.append(book.model_dump())
         self.repo.save_data(books)
         return book
 
-    def update_book(self, new_book: models.Book) -> models.Book:
+    def get_book(self, book_id):
+        books: list[dict] = self.get_books()
+        res = {}
+        for book in books:
+            if book_id == book['id']:
+                res = book
+        return Book(**res)
+
+    def update_book(self, new_book):
         self.delete_book(new_book.id)
         self.add_book(new_book)
         return new_book
 
-    def delete_book(self, book_id: int) -> models.Book:
+    def delete_book(self, book_id):
         books: list[dict] = self.get_books()
         res = {}
         for i, book in enumerate(books):
             if book_id == book['id']:
-                res = books.pop(i)
+                deleted_book = books.pop(i)
         self.repo.save_data(books)
 
-        return models.Book(**res)
+        return Book(**deleted_book)
 
 
 class JSONRepository:
@@ -65,8 +67,7 @@ class JSONRepository:
 
 
 if __name__ == '__main__':
-    bm = JsonBookManager()
-    book = models.Book(**{
+    book = Book(**{
       "id": 2,
       "title": "string",
       "autor": "string",
@@ -75,5 +76,3 @@ if __name__ == '__main__':
       "count_page": 0,
       "accessibility": "в наличии"
     })
-
-    print(bm.update_book(book))

@@ -1,11 +1,11 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor, RealDictRow
 
-import src.models as models
+from src.models.book_model import Book
+from src.repositories.base_repository import BaseBookRepository
 
 
-
-class DBBookRepository:
+class DBBookRepository(BaseBookRepository):
     def __init__(self, dns: str):
         self.dns = dns
 
@@ -28,7 +28,18 @@ class DBBookRepository:
             cur.execute(query)
             conn.commit()
 
-    def add_book(self, book: models.Book) -> int:
+    #------------------------CRUD-----------------------------#
+
+
+    def get_books(self):
+        query = "SELECT * FROM books ORDER BY id;"
+        with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(query)
+            list_books = cur.fetchall()
+            res = [Book(**book) for book in list_books]
+            return res
+
+    def add_book(self, book):
         query = """
                 INSERT INTO books (title, author, year, genre, count_page, accessibility)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -37,7 +48,7 @@ class DBBookRepository:
         with self._get_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (
                 book.title,
-                book.autor,
+                book.author,
                 book.year,
                 book.genre,
                 book.count_page,
@@ -45,21 +56,16 @@ class DBBookRepository:
             ))
             book_id = cur.fetchone()[0]
             conn.commit()
-            return book_id
+            return book
 
-    def get_book(self, book_id: int) -> RealDictRow:
+    def get_book(self, book_id):
         query = "SELECT * FROM books WHERE id = %s;"
         with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(query, (book_id,))
-            return cur.fetchone()
+            res = Book(**cur.fetchone())
+            return res
 
-    def get_books(self) -> list:
-        query = "SELECT * FROM books ORDER BY id;"
-        with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query)
-            return cur.fetchall()
-
-    def update_book(self, book: models.Book) -> RealDictRow:
+    def update_book(self, new_book):
         query = """
                 UPDATE books
                 SET title = %s,
@@ -72,19 +78,20 @@ class DBBookRepository:
                 """
         with self._get_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (
-                book.title,
-                book.autor,
-                book.year,
-                book.genre,
-                book.count_page,
-                book.accessibility,
-                book.id
+                new_book.title,
+                new_book.author,
+                new_book.year,
+                new_book.genre,
+                new_book.count_page,
+                new_book.accessibility,
+                new_book.id
             ))
             conn.commit()
 
-        return self.get_book(book_id=book.id)
+        return new_book
 
-    def delete_book(self, book_id: int) -> list:
+
+    def delete_book(self, book_id) -> list[Book]:
         query = "DELETE FROM books WHERE id = %s;"
         with self._get_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (book_id,))
@@ -95,19 +102,15 @@ class DBBookRepository:
 
 if __name__ == '__main__':
     repo = DBBookRepository('postgresql://postgres:postgres@localhost:5432/Library')
-    repo.create_table()
+    # repo.create_table()
 
-    book = models.Book(**{
-        "id": 3,
+    book = Book(**{
+        "id": 5,
         "title": "Dima",
-        "autor": "string",
-        "year": 100,
+        "author": "string",
+        "year": 0,
         "genre": "string",
         "count_page": 100,
         "accessibility": "в наличии"
     })
-
-
-    print(repo.get_books())
-    print(repo.get_book(2))
-    print(repo.add_book(book))
+    print(repo.delete_book(5))

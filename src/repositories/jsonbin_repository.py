@@ -5,9 +5,9 @@ import os
 import httpx
 from fastapi_cloud_cli.utils.cli import handle_http_errors
 
-import src.models as models
+from src.models.book_model import Book
 
-class JsonBin:
+class JsonBinRepository:
     """
     Класс для работы с API JSONBin.io (CRUD)
     """
@@ -18,7 +18,7 @@ class JsonBin:
         """
         Инициализация клиента JSONBin
         :param master_key: Секретный ключ из JSONBin.io
-        :param index_bin_id: Bin со всеми данными
+        :param bin_id: Bin со всеми данными
         """
         self.master_key = master_key or os.getenv("JSONBIN_SECRET_KEY")
         if not self.master_key:
@@ -40,41 +40,43 @@ class JsonBin:
         response = httpx.get(self.url, headers=self.headers)
         return response.json()['record']['bins']
 
-    def get_book(self, book_id: int) -> list[dict]:
-        books = self.get_books()
-        res = {}
-        for book in books:
-            if book_id == book['id']:
-                res = book
-        return res
-
-    def add_book(self, book: models.Book) -> list[dict]:
+    def add_book(self, book):
         books: list[dict] = self.get_books()
         books.append(book.model_dump())
         res = {
             'bins': books
         }
         response = httpx.put(self.url, json=res, headers=self.headers)
-        return response.json()['record']['bins']
+        return book
 
-    def update_book(self, new_book: models.Book) -> list[dict]:
-        self.delete_book(new_book.id)
-        res = self.add_book(new_book)
-        return res
-
-    def delete_book(self, book_id: int) -> list[dict]:
+    def get_book(self, book_id):
         books: list[dict] = self.get_books()
+        res = {}
+        for book in books:
+            if book_id == book['id']:
+                res = book
+        return Book(**res)
+
+
+    def update_book(self, new_book):
+        self.delete_book(new_book.id)
+        self.add_book(new_book)
+        return new_book
+
+    def delete_book(self, book_id):
+        books: list[dict] = self.get_books()
+        deleted_book = None
         for i, book in enumerate(books):
             if book_id == book['id']:
-                books.pop(i)
+                deleted_book = books.pop(i)
         res = {
             'bins': books
         }
         response = httpx.put(self.url, json=res, headers=self.headers)
-        return response.json()['record']['bins']
+        return deleted_book
 
 if __name__ == '__main__':
-    book = models.Book(**{
+    book = Book(**{
         "id": 1,
         "title": "Sasha",
         "autor": "string",
@@ -83,6 +85,3 @@ if __name__ == '__main__':
         "count_page": 0,
         "accessibility": "в наличии"
     })
-
-    js = JsonBin('$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O', '69008a2a43b1c97be986cdc7')
-    print(js.update_book(book))

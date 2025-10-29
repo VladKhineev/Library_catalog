@@ -9,8 +9,9 @@ class AvailabilityStatus(str, Enum):
 class Book(BaseModel):
     id: int
     title: str
-    autor: str
+    author: str
     year: int
     genre: str
     count_page: int
     accessibility: AvailabilityStatus
+
