@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.Core import config
+from src.core import config
 
 from src.managers.book_manager import BookManager
 from src.managers.enrichment_manager import BookEnrichmentManager
@@ -14,22 +14,25 @@ from src.repositories.jsonbin_repository import JsonBinRepository
 
 from src.integrations.openlibrary_api import OpenLibraryAPI
 
+from loguru import logger
+
+
 router = APIRouter(prefix='/books', tags=['Books'])
 
 def choose_repository(source: Repo):
     if source == Repo.POSTGRES:
-        repo = DBBookRepository(dns=config.POSTGRES_URL)
+        repo = DBBookRepository(dns=config.POSTGRES_URL, logger_instance=logger)
     elif source == Repo.JSON:
-        repo = JsonBookRepository()
+        repo = JsonBookRepository(logger)
     elif source == Repo.JSONBIN:
-        repo = JsonBinRepository(master_key=config.MASTER_KEY, bin_id=config.BIN_ID)
+        repo = JsonBinRepository(master_key=config.MASTER_KEY, bin_id=config.BIN_ID, logger_instance=logger)
     else:
         raise ValueError("Unknown source")
     return repo
 
 def get_book_manager(source: Repo):
     repo = choose_repository(source)
-    return BookManager(repo)
+    return BookManager(repo, logger)
 
 
 def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:

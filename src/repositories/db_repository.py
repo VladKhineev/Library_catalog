@@ -6,7 +6,10 @@ from src.repositories.base_repository import BaseBookRepository
 
 
 class DBBookRepository(BaseBookRepository):
-    def __init__(self, dns: str):
+    def __init__(self, dns: str = None, logger_instance=None):
+        super().__init__(logger_instance)
+        self.logger.info(f"POSTGRES DB")
+
         self.dns = dns
 
     def _get_connection(self):

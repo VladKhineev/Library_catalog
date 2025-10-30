@@ -3,3 +3,4 @@
 .gitignore
 *.json
 **/__pycache__/
+*.log

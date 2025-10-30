@@ -1,7 +1,10 @@
 import httpx
-from src.models.book_model import BookExternalInfo
 
-class OpenLibraryAPI:
+from src.models.book_model import BookExternalInfo
+from src.integrations.base_api_client import BaseApiClient
+
+
+class OpenLibraryAPI(BaseApiClient):
     BASE_URL = "https://openlibrary.org/search.json"
     WORKS_URL = "https://openlibrary.org"
 
