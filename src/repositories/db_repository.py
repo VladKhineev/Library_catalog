@@ -4,6 +4,8 @@ from psycopg2.extras import RealDictCursor, RealDictRow
 from src.models.book_model import Book, BookExternalInfo
 from src.repositories.base_repository import BaseBookRepository
 
+from src.core.decorators import handle_error
+import src.core.exceptions as exception
 
 class DBBookRepository(BaseBookRepository):
     def __init__(self, dns: str = None, logger_instance=None):
@@ -41,7 +43,7 @@ class DBBookRepository(BaseBookRepository):
             conn.commit()
     #------------------------CRUD-----------------------------#
 
-
+    @handle_error()
     def get_books(self):
         query = "SELECT * FROM books ORDER BY id;"
         with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -50,6 +52,7 @@ class DBBookRepository(BaseBookRepository):
             res = [Book(**book) for book in list_books]
             return res
 
+    @handle_error()
     def add_book(self, book):
         query = """
                 INSERT INTO books (title, author, year, genre, count_page, accessibility, external)
@@ -70,6 +73,7 @@ class DBBookRepository(BaseBookRepository):
             conn.commit()
             return book
 
+    @handle_error()
     def get_book(self, book_id):
         query = "SELECT * FROM books WHERE id = %s;"
         with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -77,6 +81,7 @@ class DBBookRepository(BaseBookRepository):
             res = Book(**cur.fetchone())
             return res
 
+    @handle_error()
     def update_book(self, new_book):
         query = """
                 UPDATE books
@@ -105,6 +110,7 @@ class DBBookRepository(BaseBookRepository):
         return new_book
 
 
+    @handle_error()
     def delete_book(self, book_id) -> list[Book]:
         query = "DELETE FROM books WHERE id = %s;"
         with self._get_connection() as conn, conn.cursor() as cur:
@@ -118,7 +124,7 @@ if __name__ == '__main__':
     repo = DBBookRepository('postgresql://postgres:postgres@localhost:5432/Library')
     # repo.create_table()
     # repo.drope_table()
-
+    print(repo.get_book(43242))
     # book = Book(**{
     #     "id": 5,
     #     "title": "Dima",
