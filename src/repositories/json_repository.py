@@ -6,7 +6,10 @@ from src.repositories.base_repository import BaseBookRepository
 
 
 class JsonBookRepository(BaseBookRepository):
-    def __init__(self):
+    def __init__(self, logger_instance=None):
+        super().__init__(logger_instance)
+        self.logger.info(f"JSON ФАЙЛ")
+
         self.repo = JSONRepository('../books.json')
 
     def get_books(self) -> list[dict]:

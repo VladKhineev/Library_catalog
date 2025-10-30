@@ -6,20 +6,26 @@ import httpx
 from fastapi_cloud_cli.utils.cli import handle_http_errors
 
 from src.models.book_model import Book
+from src.repositories.base_repository import BaseBookRepository
 
-class JsonBinRepository:
+
+class JsonBinRepository(BaseBookRepository):
     """
     Класс для работы с API JSONBin.io (CRUD)
     """
     INDEX_BIN_ID = "6722b1ff8a8c444e3b99b123"
     BASE_URL = "https://api.jsonbin.io/v3/b"
 
-    def __init__(self, master_key: str = None, bin_id: str = None):
+    def __init__(self, master_key: str = None, bin_id: str = None, logger_instance=None):
         """
         Инициализация клиента JSONBin
         :param master_key: Секретный ключ из JSONBin.io
         :param bin_id: Bin со всеми данными
+        :param logger_instance: logger
         """
+        super().__init__(logger_instance)
+        self.logger.info(f"JSON BIN")
+
         self.master_key = master_key or os.getenv("JSONBIN_SECRET_KEY")
         if not self.master_key:
             raise ValueError("Не указан JSONBIN_SECRET_KEY")
