@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.Core import config
+from src.core import config
 
 from src.managers.book_manager import BookManager
 from src.managers.enrichment_manager import BookEnrichmentManager
@@ -13,6 +13,9 @@ from src.repositories.json_repository import JsonBookRepository
 from src.repositories.jsonbin_repository import JsonBinRepository
 
 from src.integrations.openlibrary_api import OpenLibraryAPI
+
+from loguru import logger
+
 
 router = APIRouter(prefix='/books', tags=['Books'])
 
@@ -29,7 +32,7 @@ def choose_repository(source: Repo):
 
 def get_book_manager(source: Repo):
     repo = choose_repository(source)
-    return BookManager(repo)
+    return BookManager(repo, logger)
 
 
 def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:
