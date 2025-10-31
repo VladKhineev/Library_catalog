@@ -1,0 +1,56 @@
+[project]
+name = "book-manager"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "VladKhineev",email = "vlad.khineev@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "fastapi (>=0.120.3,<0.121.0)",
+    "uvicorn[standard] (>=0.38.0,<0.39.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "pydantic (>=2.12.3,<3.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "black (>=25.9.0,<26.0.0)",
+    "ruff (>=0.14.3,<0.15.0)",
+    "isort (>=7.0.0,<8.0.0)",
+    "mypy (>=1.18.2,<2.0.0)",
+    "pre-commit (>=4.3.0,<5.0.0)",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.ruff]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+line-length = 88
+target-version = "py312"
+fix = true
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+warn_return_any = true
+

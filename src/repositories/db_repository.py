@@ -1,16 +1,15 @@
 import psycopg2
-from psycopg2.extras import RealDictCursor, RealDictRow
-
-from src.models.book_model import Book, BookExternalInfo
-from src.repositories.base_repository import BaseBookRepository
+from psycopg2.extras import RealDictCursor
 
 from src.core.decorators import handle_error
-import src.core.exceptions as exception
+from src.models.book_model import Book
+from src.repositories.base_repository import BaseBookRepository
+
 
 class DBBookRepository(BaseBookRepository):
     def __init__(self, dns: str = None, logger_instance=None):
         super().__init__(logger_instance)
-        self.logger.info(f"POSTGRES DB")
+        self.logger.info("POSTGRES DB")
 
         self.dns = dns
 
@@ -41,12 +40,16 @@ class DBBookRepository(BaseBookRepository):
         with self._get_connection() as conn, conn.cursor() as cur:
             cur.execute(query)
             conn.commit()
-    #------------------------CRUD-----------------------------#
+
+    # ------------------------CRUD-----------------------------#
 
     @handle_error()
     def get_books(self):
         query = "SELECT * FROM books ORDER BY id;"
-        with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with (
+            self._get_connection() as conn,
+            conn.cursor(cursor_factory=RealDictCursor) as cur,
+        ):
             cur.execute(query)
             list_books = cur.fetchall()
             res = [Book(**book) for book in list_books]
@@ -60,23 +63,29 @@ class DBBookRepository(BaseBookRepository):
                 RETURNING id;
                 """
         with self._get_connection() as conn, conn.cursor() as cur:
-            cur.execute(query, (
-                book.title,
-                book.author,
-                book.year,
-                book.genre,
-                book.count_page,
-                book.accessibility,
-                book.external.model_dump_json(),
-            ))
-            book_id = cur.fetchone()[0]
+            cur.execute(
+                query,
+                (
+                    book.title,
+                    book.author,
+                    book.year,
+                    book.genre,
+                    book.count_page,
+                    book.accessibility,
+                    book.external.model_dump_json(),
+                ),
+            )
+            cur.fetchone()[0]
             conn.commit()
             return book
 
     @handle_error()
     def get_book(self, book_id):
         query = "SELECT * FROM books WHERE id = %s;"
-        with self._get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with (
+            self._get_connection() as conn,
+            conn.cursor(cursor_factory=RealDictCursor) as cur,
+        ):
             cur.execute(query, (book_id,))
             res = Book(**cur.fetchone())
             return res
@@ -95,20 +104,22 @@ class DBBookRepository(BaseBookRepository):
                 WHERE id = %s;
                 """
         with self._get_connection() as conn, conn.cursor() as cur:
-            cur.execute(query, (
-                new_book.title,
-                new_book.author,
-                new_book.year,
-                new_book.genre,
-                new_book.count_page,
-                new_book.accessibility,
-                new_book.external.model_dump_json(),
-                new_book.id,
-            ))
+            cur.execute(
+                query,
+                (
+                    new_book.title,
+                    new_book.author,
+                    new_book.year,
+                    new_book.genre,
+                    new_book.count_page,
+                    new_book.accessibility,
+                    new_book.external.model_dump_json(),
+                    new_book.id,
+                ),
+            )
             conn.commit()
 
         return new_book
-
 
     @handle_error()
     def delete_book(self, book_id) -> list[Book]:

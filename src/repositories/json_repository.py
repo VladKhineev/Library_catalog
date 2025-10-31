@@ -1,16 +1,16 @@
 import json
 import os
 
+import src.core.exceptions as exception
+from src.core.decorators import handle_error
 from src.models.book_model import Book
 from src.repositories.base_repository import BaseBookRepository
 
-from src.core.decorators import handle_error
-import src.core.exceptions as exception
 
 class JsonBookRepository(BaseBookRepository):
     def __init__(self, logger_instance=None):
         super().__init__(logger_instance)
-        self.logger.info(f"JSON ФАЙЛ")
+        self.logger.info("JSON ФАЙЛ")
 
         self.repo = JSONRepository('../books.json')
 
@@ -38,7 +38,9 @@ class JsonBookRepository(BaseBookRepository):
     def update_book(self, new_book):
         deleted_book = self.delete_book(new_book.id)
         if not deleted_book:
-            raise AttributeError(f"Невозможно обновить. Книга '{new_book.id}' не найдена")
+            raise AttributeError(
+                f"Невозможно обновить. Книга '{new_book.id}' не найдена"
+            )
         self.add_book(new_book)
         return new_book
 
@@ -67,7 +69,7 @@ class JSONRepository:
 
     def load_data(self) -> list[dict]:
         if os.path.exists(self.filename):
-            with open(self.filename, "r", encoding="utf-8") as f:
+            with open(self.filename, encoding="utf-8") as f:
                 try:
                     data = json.load(f)
                 except json.JSONDecodeError:
@@ -78,18 +80,17 @@ class JSONRepository:
         return data
 
 
-
-
 if __name__ == '__main__':
-    book = Book(**{
-      "id": 232,
-      "title": "string",
-      "author": "string",
-      "year": 1,
-      "genre": "string",
-      "count_page": 0,
-      "accessibility": "в наличии"
-    })
+    book = Book(
+        **{
+            "id": 232,
+            "title": "string",
+            "author": "string",
+            "year": 1,
+            "genre": "string",
+            "count_page": 0,
+            "accessibility": "в наличии",
+        }
+    )
     jb = JsonBookRepository()
     jb.update_book(book)
-

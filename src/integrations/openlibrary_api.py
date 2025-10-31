@@ -1,7 +1,7 @@
 import httpx
 
-from src.models.book_model import BookExternalInfo
 from src.integrations.base_api_client import BaseApiClient
+from src.models.book_model import BookExternalInfo
 
 
 class OpenLibraryAPI(BaseApiClient):
@@ -18,7 +18,11 @@ class OpenLibraryAPI(BaseApiClient):
         book = data['docs'][0]
 
         cover_id = book.get('cover_i')
-        cover_url = f'https://covers.openlibrary.org/b/id/{cover_id}-L.jpg' if cover_id else None
+        cover_url = (
+            f'https://covers.openlibrary.org/b/id/{cover_id}-L.jpg'
+            if cover_id
+            else None
+        )
 
         # по ключу книги достаём описание
         work_key = book.get('key')
@@ -35,10 +39,8 @@ class OpenLibraryAPI(BaseApiClient):
                 elif isinstance(desc, str):
                     description = desc
 
-        return BookExternalInfo(
-            cover=cover_url,
-            description=description
-        )
+        return BookExternalInfo(cover=cover_url, description=description)
+
 
 if __name__ == '__main__':
     api = OpenLibraryAPI()

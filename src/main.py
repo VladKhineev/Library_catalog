@@ -1,11 +1,10 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 import time
 
-from src.core.logging_service import LoggerService
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
 from src.api.books_router import router as books_router
-
-
+from src.core.logging_service import LoggerService
 
 app = FastAPI(title='Books API')
 app.include_router(books_router)
@@ -24,7 +23,9 @@ async def log_requests(request, call_next):
     try:
         response = await call_next(request)
         process_time = (time.time() - start_time) * 1000
-        logger.info(f"📤 {request.method} {request.url} -> {response.status_code} ({process_time:.2f} ms)")
+        logger.info(
+            f"📤 {request.method} {request.url} -> {response.status_code} ({process_time:.2f} ms)"
+        )
         return response
     except Exception as e:
         logger.exception(f"❌ Ошибка при обработке запроса: {e}")
@@ -42,6 +43,7 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={"detail": "Что-то пошло не так"},
     )
+
 
 @app.get("/")
 async def root():
