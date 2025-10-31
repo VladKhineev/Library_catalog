@@ -16,9 +16,9 @@ def handle_error(
 
     def decorator(func):
         @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
+        async def async_wrapper(self, *args, **kwargs):
             try:
-                return func(self, *args, **kwargs)
+                return await func(self, *args, **kwargs)
             except exception.BookNotFoundError as e:
                 log = getattr(self, "logger", logger)
                 log.warning(f"[404] {e}")
@@ -36,6 +36,6 @@ def handle_error(
                     raise HTTPException(status_code=http_error, detail=msg or str(e))
                 return default_return
 
-        return wrapper
+        return async_wrapper
 
     return decorator

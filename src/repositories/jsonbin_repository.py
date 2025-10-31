@@ -44,35 +44,49 @@ class JsonBinRepository(BaseBookRepository):
         self.url = f"{self.BASE_URL}/{bin_id}"
 
     @handle_error()
-    def get_books(self) -> list[dict]:
-        response = httpx.get(self.url, headers=self.headers)
-        return response.json()['record']['bins']
+    async def get_books(self) -> list[dict]:
+        with httpx.AsyncClient() as client:
+            response = await client.get(self.url, headers=self.headers)
+            return response.json()['record']['bins']
 
     @handle_error()
-    def add_book(self, book):
-        books: list[dict] = self.get_books()
+    async def add_book(self, book):
+        books: list[dict] = await self.get_books()
         books.append(book.model_dump())
         res = {'bins': books}
-        httpx.put(self.url, json=res, headers=self.headers)
-        return book
+
+        with httpx.AsyncClient() as client:
+            await client.put(self.url, json=res, headers=self.headers)
+            return book
 
     @handle_error()
-    def get_book(self, book_id):
-        books: list[dict] = self.get_books()
+    async def get_book(self, book_id):
+        books: list[dict] = await self.get_books()
         for book in books:
             if book_id == book['id']:
                 return Book(**book)
         raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
 
     @handle_error()
-    def update_book(self, new_book):
-        self.delete_book(new_book.id)
-        self.add_book(new_book)
+    async def update_book(self, new_book):
+        books: list[dict] = await self.get_books()
+
+        for i, book in enumerate(books):
+            if book['id'] == new_book.id:
+                books[i] = new_book.model_dump()
+                break
+        else:
+            raise exception.BookNotFoundError(f"Книга '{new_book.id}' не найдена")
+
+        res = {'bins': books}
+        async with httpx.AsyncClient() as client:
+            await client.put(self.url, json=res, headers=self.headers)
         return new_book
 
     @handle_error()
-    def delete_book(self, book_id):
-        books: list[dict] = self.get_books()
+    async def delete_book(self, book_id):
+        books: list[dict] = await self.get_books()
+
         deleted_book = None
         for i, book in enumerate(books):
             if book_id == book['id']:
@@ -80,8 +94,10 @@ class JsonBinRepository(BaseBookRepository):
         if not deleted_book:
             raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
         res = {'bins': books}
-        httpx.put(self.url, json=res, headers=self.headers)
-        return deleted_book
+
+        with httpx.AsyncClient() as client:
+            await client.put(self.url, json=res, headers=self.headers)
+            return deleted_book
 
 
 if __name__ == '__main__':

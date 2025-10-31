@@ -15,19 +15,19 @@ class JsonBookRepository(BaseBookRepository):
         self.repo = JSONRepository('../books.json')
 
     @handle_error()
-    def get_books(self) -> list[dict]:
+    async def get_books(self) -> list[dict]:
         res = self.repo.load_data()
         return res
 
     @handle_error()
-    def add_book(self, book):
+    async def add_book(self, book):
         books: list[dict] = self.get_books()
         books.append(book.model_dump())
         self.repo.save_data(books)
         return book
 
     @handle_error()
-    def get_book(self, book_id):
+    async def get_book(self, book_id):
         books: list[dict] = self.get_books()
         for book in books:
             if book_id == book['id']:
@@ -35,7 +35,7 @@ class JsonBookRepository(BaseBookRepository):
         raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
 
     @handle_error()
-    def update_book(self, new_book):
+    async def update_book(self, new_book):
         deleted_book = self.delete_book(new_book.id)
         if not deleted_book:
             raise AttributeError(
@@ -45,7 +45,7 @@ class JsonBookRepository(BaseBookRepository):
         return new_book
 
     @handle_error()
-    def delete_book(self, book_id):
+    async def delete_book(self, book_id):
         books: list[dict] = self.get_books()
         deleted_book = {}
         for i, book in enumerate(books):
