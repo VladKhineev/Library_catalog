@@ -13,8 +13,7 @@ from src.repositories.db_repository import DBBookRepository
 from src.repositories.json_repository import JsonBookRepository
 from src.repositories.jsonbin_repository import JsonBinRepository
 
-router = APIRouter(prefix='/books', tags=['Books'])
-
+router = APIRouter(prefix='/api/v1/books', tags=['Books'])
 
 def choose_repository(source: Repo) -> BaseBookRepository:
     settings: Settings = get_settings()
