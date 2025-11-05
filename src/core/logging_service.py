@@ -57,8 +57,8 @@ if __name__ == '__main__':
 
     logger = LoggerService("BookRepository")
 
-    logger.info("Добавляем новую книгу")
+    logger.info("add new book")
     try:
-        raise ValueError("Ошибка при вставке")
+        raise ValueError("Insertion error")
     except Exception as e:
-        logger.error("Не удалось добавить книгу", e)
+        logger.error("Unable to add a book", e)

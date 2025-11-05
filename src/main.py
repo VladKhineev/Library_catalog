@@ -28,7 +28,7 @@ async def log_requests(request, call_next):
         )
         return response
     except Exception as e:
-        logger.exception(f"❌ Ошибка при обработке запроса: {e}")
+        logger.exception(f"❌ Request processing error: {e}")
         return JSONResponse(
             status_code=500,
             content={"detail": "Internal Server Error"},
@@ -38,8 +38,8 @@ async def log_requests(request, call_next):
 #  Глобальный перехват исключений FastAPI
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    logger.exception(f"🔥 Неперехваченное исключение: {exc}")
+    logger.exception(f"🔥 Uncaught exception: {exc}")
     return JSONResponse(
         status_code=500,
-        content={"detail": "Что-то пошло не так"},
+        content={"detail": "Something went wrong"},
     )

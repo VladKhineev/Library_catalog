@@ -29,7 +29,7 @@ class JsonBinRepository(BaseBookRepository):
 
         self.master_key = master_key or os.getenv("JSONBIN_SECRET_KEY")
         if not self.master_key:
-            raise ValueError("Не указан JSONBIN_SECRET_KEY")
+            raise ValueError("Not specified JSONBIN_SECRET_KEY")
 
         self.headers = {
             "Content-Type": "application/json",
@@ -38,7 +38,7 @@ class JsonBinRepository(BaseBookRepository):
 
         self.bin_id = bin_id
         if not self.bin_id:
-            raise ValueError("Не указан bin_id")
+            raise ValueError("Not specified bin_id")
 
         self.url = f"{self.BASE_URL}/{bin_id}"
 
@@ -64,7 +64,7 @@ class JsonBinRepository(BaseBookRepository):
         for book in books:
             if book_id == book['id']:
                 return Book(**book)
-        raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
+        raise exception.BookNotFoundError(f"Book '{book_id}' no found")
 
     @handle_error()
     async def update_book(self, new_book):
@@ -75,7 +75,7 @@ class JsonBinRepository(BaseBookRepository):
                 books[i] = new_book.model_dump()
                 break
         else:
-            raise exception.BookNotFoundError(f"Книга '{new_book.id}' не найдена")
+            raise exception.BookNotFoundError(f"Book '{new_book.id}' no found")
 
         res = {'bins': books}
         async with httpx.AsyncClient() as client:
@@ -91,7 +91,7 @@ class JsonBinRepository(BaseBookRepository):
             if book_id == book['id']:
                 deleted_book = books.pop(i)
         if not deleted_book:
-            raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
+            raise exception.BookNotFoundError(f"Book '{book_id}' no found")
         res = {'bins': books}
 
         async with httpx.AsyncClient() as client:

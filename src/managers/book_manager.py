@@ -47,7 +47,7 @@ if __name__ == '__main__':
         **{
             "id": 4,
             "title": "Sasha",
-            "autor": "string",
+            "author": "string",
             "year": 0,
             "genre": "string",
             "count_page": 1000000000,

@@ -44,37 +44,37 @@ def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:
     return BookEnrichmentManager(manager, api)
 
 
-@handle_error(default_return=[], msg='Ошибка при получении списка книг')
+@handle_error(default_return=[], msg='Error getting a list of books')
 @router.get('/', response_model=list[Book])
 async def get_books(manager: BookManager = Depends(get_book_manager)) -> list[Book]:
     return await manager.get_books()
 
 
-@handle_error(default_return=[], msg='Ошибка при добавлении книги')
+@handle_error(default_return=[], msg='Error when adding a workbook')
 @router.post('/', response_model=Book)
 async def add_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.add_book(book)
 
 
-@handle_error(default_return=[], msg='Ошибка при получении книги')
+@handle_error(default_return=[], msg='Error receiving the book')
 @router.get('/{book_id}', response_model=Book)
 async def get_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.get_book(book_id)
 
 
-@handle_error(default_return=[], msg='Ошибка при обновлении книги')
+@handle_error(default_return=[], msg='Error when updating a workbook')
 @router.put('/', response_model=Book)
 async def update_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.update_book(book)
 
 
-@handle_error(default_return=[], msg='Ошибка при удалении книги')
+@handle_error(default_return=[], msg='Error when deleting a book')
 @router.delete('/{book_id}', response_model=Book)
 async def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.delete_book(book_id)
 
 
-@handle_error(default_return=[], msg='Ошибка при добавлении книги')
+@handle_error(default_return=[], msg='(Enriched): Error when adding a workbook')
 @router.post('/enriched/', response_model=Book)
 async def create_book_enriched(
     book: Book, manager: BookEnrichmentManager = Depends(get_enrichment_manager)

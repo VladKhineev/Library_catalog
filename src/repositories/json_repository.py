@@ -32,14 +32,14 @@ class JsonBookRepository(BaseBookRepository):
         for book in books:
             if book_id == book['id']:
                 return Book(**book)
-        raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
+        raise exception.BookNotFoundError(f"Book '{book_id}' no found")
 
     @handle_error()
     async def update_book(self, new_book):
         deleted_book = await self.delete_book(new_book.id)
         if not deleted_book:
             raise AttributeError(
-                f"Невозможно обновить. Книга '{new_book.id}' не найдена"
+                f"Unable to update. Book '{new_book.id}' no found"
             )
         await self.add_book(new_book)
         return new_book
@@ -54,7 +54,7 @@ class JsonBookRepository(BaseBookRepository):
         self.repo.save_data(books)
 
         if not deleted_book:
-            raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
+            raise exception.BookNotFoundError(f"Book '{book_id}' no found")
 
         return Book(**deleted_book)
 

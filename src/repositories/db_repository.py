@@ -44,7 +44,7 @@ class DBBookRepository(BaseBookRepository):
         async with pool.acquire() as conn:
             await conn.execute(query)
 
-    async def drope_table(self):
+    async def drop_table(self):
         query = "DROP TABLE IF EXISTS books;"
         pool = await self._get_pool()
         async with pool.acquire() as conn:
@@ -147,7 +147,7 @@ class DBBookRepository(BaseBookRepository):
 if __name__ == '__main__':
     repo = DBBookRepository('postgresql://postgres:postgres@localhost:5432/Library')
     # repo.create_table()
-    # repo.drope_table()
+    # repo.drop_table()
     print(repo.get_book(43242))
     # book = Book(**{
     #     "id": 5,
