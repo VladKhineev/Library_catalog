@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from loguru import logger
 
 from src.core.config import Settings, get_settings
@@ -44,37 +44,37 @@ def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:
 
 
 @handle_error(default_return=[], msg='Error getting a list of books')
-@router.get('/', response_model=list[Book])
+@router.get('/', response_model=list[Book], status_code=status.HTTP_200_OK)
 async def get_books(manager: BookManager = Depends(get_book_manager)) -> list[Book]:
     return await manager.get_books()
 
 
 @handle_error(default_return=[], msg='Error when adding a workbook')
-@router.post('/', response_model=Book)
+@router.post('/', response_model=Book, status_code=status.HTTP_201_CREATED)
 async def add_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.add_book(book)
 
 
 @handle_error(default_return=[], msg='Error receiving the book')
-@router.get('/{book_id}', response_model=Book)
+@router.get('/{book_id}', response_model=Book, status_code=status.HTTP_200_OK)
 async def get_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.get_book(book_id)
 
 
 @handle_error(default_return=[], msg='Error when updating a workbook')
-@router.put('/', response_model=Book)
+@router.put('/', response_model=Book, status_code=status.HTTP_200_OK)
 async def update_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.update_book(book)
 
 
 @handle_error(default_return=[], msg='Error when deleting a book')
-@router.delete('/{book_id}', response_model=Book)
+@router.delete('/{book_id}', response_model=Book, status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.delete_book(book_id)
 
 
 @handle_error(default_return=[], msg='(Enriched): Error when adding a workbook')
-@router.post('/enriched/', response_model=Book)
+@router.post('/enriched/', response_model=Book, status_code=status.HTTP_201_CREATED)
 async def create_book_enriched(
     book: Book, manager: BookEnrichmentManager = Depends(get_enrichment_manager)
 ) -> Book:
