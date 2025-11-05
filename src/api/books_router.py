@@ -8,6 +8,7 @@ from src.managers.book_manager import BookManager
 from src.managers.enrichment_manager import BookEnrichmentManager
 from src.models.book_model import Book
 from src.models.repo_model import Repo
+from src.repositories.base_repository import BaseBookRepository
 from src.repositories.db_repository import DBBookRepository
 from src.repositories.json_repository import JsonBookRepository
 from src.repositories.jsonbin_repository import JsonBinRepository
@@ -15,7 +16,7 @@ from src.repositories.jsonbin_repository import JsonBinRepository
 router = APIRouter(prefix='/books', tags=['Books'])
 
 
-def choose_repository(source: Repo):
+def choose_repository(source: Repo) -> BaseBookRepository:
     settings: Settings = get_settings()
     if source == Repo.POSTGRES:
         repo = DBBookRepository(dsn=settings.POSTGRES_URL, logger_instance=logger)
@@ -32,7 +33,7 @@ def choose_repository(source: Repo):
     return repo
 
 
-def get_book_manager(source: Repo):
+def get_book_manager(source: Repo) -> BookManager:
     repo = choose_repository(source)
     return BookManager(repo, logger)
 
@@ -44,38 +45,38 @@ def get_enrichment_manager(source: Repo) -> BookEnrichmentManager:
 
 
 @handle_error(default_return=[], msg='Ошибка при получении списка книг')
-@router.get('/')
-async def get_books(manager: BookManager = Depends(get_book_manager)):
+@router.get('/', response_model=list[Book])
+async def get_books(manager: BookManager = Depends(get_book_manager)) -> list[Book]:
     return await manager.get_books()
 
 
 @handle_error(default_return=[], msg='Ошибка при добавлении книги')
-@router.post('/')
-async def add_book(book: Book, manager: BookManager = Depends(get_book_manager)):
+@router.post('/', response_model=Book)
+async def add_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.add_book(book)
 
 
 @handle_error(default_return=[], msg='Ошибка при получении книги')
-@router.get('/{book_id}')
-async def get_book(book_id: int, manager: BookManager = Depends(get_book_manager)):
+@router.get('/{book_id}', response_model=Book)
+async def get_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.get_book(book_id)
 
 
 @handle_error(default_return=[], msg='Ошибка при обновлении книги')
-@router.put('/')
-async def update_book(book: Book, manager: BookManager = Depends(get_book_manager)):
+@router.put('/', response_model=Book)
+async def update_book(book: Book, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.update_book(book)
 
 
 @handle_error(default_return=[], msg='Ошибка при удалении книги')
-@router.delete('/{book_id}')
-async def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)):
+@router.delete('/{book_id}', response_model=Book)
+async def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.delete_book(book_id)
 
 
 @handle_error(default_return=[], msg='Ошибка при добавлении книги')
-@router.post('/enriched/')
+@router.post('/enriched/', response_model=Book)
 async def create_book_enriched(
     book: Book, manager: BookEnrichmentManager = Depends(get_enrichment_manager)
-):
+) -> Book:
     return await manager.add_with_api(book)
