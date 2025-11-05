@@ -21,14 +21,14 @@ class JsonBookRepository(BaseBookRepository):
 
     @handle_error()
     async def add_book(self, book):
-        books: list[dict] = self.get_books()
+        books: list[dict] = await self.get_books()
         books.append(book.model_dump())
         self.repo.save_data(books)
         return book
 
     @handle_error()
     async def get_book(self, book_id):
-        books: list[dict] = self.get_books()
+        books: list[dict] = await self.get_books()
         for book in books:
             if book_id == book['id']:
                 return Book(**book)
@@ -36,17 +36,17 @@ class JsonBookRepository(BaseBookRepository):
 
     @handle_error()
     async def update_book(self, new_book):
-        deleted_book = self.delete_book(new_book.id)
+        deleted_book = await self.delete_book(new_book.id)
         if not deleted_book:
             raise AttributeError(
                 f"Невозможно обновить. Книга '{new_book.id}' не найдена"
             )
-        self.add_book(new_book)
+        await self.add_book(new_book)
         return new_book
 
     @handle_error()
     async def delete_book(self, book_id):
-        books: list[dict] = self.get_books()
+        books: list[dict] = await self.get_books()
         deleted_book = {}
         for i, book in enumerate(books):
             if book_id == book['id']:

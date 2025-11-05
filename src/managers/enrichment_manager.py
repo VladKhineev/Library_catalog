@@ -10,7 +10,7 @@ class BookEnrichmentManager:
 
     async def add_with_api(self, book: Book):
         book.external = await self.external_api.fetch_book_info(book.title)
-        return self.manager.add_book(book)
+        return await self.manager.add_book(book)
 
 
 if __name__ == '__main__':

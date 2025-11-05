@@ -13,7 +13,6 @@ class JsonBinRepository(BaseBookRepository):
     Класс для работы с API JSONBin.io (CRUD)
     """
 
-    INDEX_BIN_ID = "6722b1ff8a8c444e3b99b123"
     BASE_URL = "https://api.jsonbin.io/v3/b"
 
     def __init__(
@@ -45,7 +44,7 @@ class JsonBinRepository(BaseBookRepository):
 
     @handle_error()
     async def get_books(self) -> list[dict]:
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             response = await client.get(self.url, headers=self.headers)
             return response.json()['record']['bins']
 
@@ -55,7 +54,7 @@ class JsonBinRepository(BaseBookRepository):
         books.append(book.model_dump())
         res = {'bins': books}
 
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             await client.put(self.url, json=res, headers=self.headers)
             return book
 
@@ -95,20 +94,29 @@ class JsonBinRepository(BaseBookRepository):
             raise exception.BookNotFoundError(f"Книга '{book_id}' не найдена")
         res = {'bins': books}
 
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             await client.put(self.url, json=res, headers=self.headers)
-            return deleted_book
+            return Book(**deleted_book)
 
 
 if __name__ == '__main__':
     book = Book(
         **{
-            "id": 1,
+            "id": 543,
             "title": "Sasha",
-            "autor": "string",
+            "author": "string",
             "year": 100,
             "genre": "string",
             "count_page": 0,
             "accessibility": "в наличии",
         }
     )
+
+    async def test():
+        js = JsonBinRepository(
+            '$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O',
+            '69008a2a43b1c97be986cdc7',
+        )
+        # res = await js.delete_book()
+        res = await js.add_book(book)
+        print(res)

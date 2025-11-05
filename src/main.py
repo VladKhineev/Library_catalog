@@ -43,9 +43,3 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={"detail": "Что-то пошло не так"},
     )
-
-
-@app.get("/")
-async def root():
-    logger.info("Запрос корневого эндпоинта")
-    return {"message": "Hello, Loguru!"}

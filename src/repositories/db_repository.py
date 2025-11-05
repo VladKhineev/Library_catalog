@@ -1,4 +1,7 @@
+import json
+
 import asyncpg
+
 from src.core.decorators import handle_error
 from src.models.book_model import Book
 from src.repositories.base_repository import BaseBookRepository
@@ -55,15 +58,24 @@ class DBBookRepository(BaseBookRepository):
         pool = await self._get_pool()
 
         async with pool.acquire() as conn:
+            result = []
             rows = await conn.fetch(query)
-            return [Book(**book) for book in rows]
+            for row in rows:
+                data = dict(row)
+                if isinstance(data.get("external"), str):
+                    try:
+                        data["external"] = json.loads(data["external"])
+                    except json.JSONDecodeError:
+                        data["external"] = {}
+                result.append(Book(**data))
 
+            return result
 
     @handle_error()
     async def add_book(self, book):
         query = """
                 INSERT INTO books (title, author, year, genre, count_page, accessibility, external)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING id;
                 """
         pool = await self._get_pool()
@@ -81,15 +93,19 @@ class DBBookRepository(BaseBookRepository):
             book.id = new_id
             return book
 
-
     @handle_error()
     async def get_book(self, book_id):
-        query = "SELECT * FROM books WHERE id = %s;"
+        query = "SELECT * FROM books WHERE id = $1;"
         pool = await self._get_pool()
         async with pool.acquire() as conn:
             row = await conn.fetchrow(query, book_id)
-            return Book(**dict(row)) if row else None
-
+            data = dict(row)
+            if isinstance(data.get("external"), str):
+                try:
+                    data["external"] = json.loads(data["external"])
+                except json.JSONDecodeError:
+                    data["external"] = {}
+            return Book(**data)
 
     @handle_error()
     async def update_book(self, new_book: Book) -> Book:
@@ -119,13 +135,13 @@ class DBBookRepository(BaseBookRepository):
             )
         return new_book
 
-
     @handle_error()
-    async def delete_book(self, book_id: int) -> list[Book]:
+    async def delete_book(self, book_id: int) -> Book:
         pool = await self._get_pool()
+        deleted = await self.get_book(book_id)
         async with pool.acquire() as conn:
             await conn.execute("DELETE FROM books WHERE id = $1;", book_id)
-        return await self.get_books()
+        return deleted
 
 
 if __name__ == '__main__':

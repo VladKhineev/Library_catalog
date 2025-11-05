@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from loguru import logger
 
-from src.core.config import settings
+from src.core.config import Settings, get_settings
 from src.core.decorators import handle_error
 from src.integrations.openlibrary_api import OpenLibraryAPI
 from src.managers.book_manager import BookManager
@@ -16,13 +16,16 @@ router = APIRouter(prefix='/books', tags=['Books'])
 
 
 def choose_repository(source: Repo):
+    settings: Settings = get_settings()
     if source == Repo.POSTGRES:
-        repo = DBBookRepository(dns=settings.POSTGRES_URL, logger_instance=logger)
+        repo = DBBookRepository(dsn=settings.POSTGRES_URL, logger_instance=logger)
     elif source == Repo.JSON:
         repo = JsonBookRepository(logger)
     elif source == Repo.JSONBIN:
         repo = JsonBinRepository(
-            master_key=settings.MASTER_KEY, bin_id=settings.BIN_ID, logger_instance=logger
+            master_key=settings.JSONBIN_MASTER_KEY,
+            bin_id=settings.JSONBIN_BIN_ID,
+            logger_instance=logger,
         )
     else:
         raise ValueError("Unknown source")
