@@ -1,8 +1,8 @@
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
 
-from datetime import datetime
 
 class AccessibilityStatus(str, Enum):
     IN_STOCK = 'в наличии'
@@ -12,6 +12,7 @@ class AccessibilityStatus(str, Enum):
 class BookExternalInfo(BaseModel):
     cover: str | None = None
     description: str | None = None
+
 
 class Book(BaseModel):
     id: int = Field(gt=0)
@@ -26,10 +27,11 @@ class Book(BaseModel):
     @field_validator('year')
     @classmethod
     def validate_year(cls, v):
-        from datetime import datetime
+
         if v > datetime.now().year + 10:
             raise ValueError('Year too far in future')
         return v
+
 
 class BookCreateDTO(BaseModel):
     title: str = Field(min_length=1, max_length=255)
@@ -38,6 +40,7 @@ class BookCreateDTO(BaseModel):
     genre: str = Field(min_length=1, max_length=100)
     count_page: int = Field(gt=0, alias="count_page")
     accessibility: AccessibilityStatus
+
 
 class BookUpdateDTO(BaseModel):
     id: int = Field(gt=0)
@@ -48,6 +51,7 @@ class BookUpdateDTO(BaseModel):
     count_page: int | None = Field(gt=0, alias="count_page", default=None)
     accessibility: AccessibilityStatus
     external: BookExternalInfo | None = None
+
 
 class BookResponseDTO(BaseModel):
     id: int = Field(gt=0)

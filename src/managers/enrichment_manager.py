@@ -1,6 +1,6 @@
 from src.integrations.openlibrary_api import OpenLibraryAPI
 from src.managers.book_manager import BookManager
-from src.models.book_model import Book
+from src.models.book_model import Book, BookCreateDTO, BookResponseDTO
 
 
 class BookEnrichmentManager:
@@ -8,7 +8,7 @@ class BookEnrichmentManager:
         self.manager = manager
         self.external_api = external_api
 
-    async def add_with_api(self, book: Book):
+    async def add_with_api(self, book: Book) -> BookResponseDTO:
         book.external = await self.external_api.fetch_book_info(book.title)
         return await self.manager.add_book(book)
 

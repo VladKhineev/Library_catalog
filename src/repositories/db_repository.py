@@ -67,7 +67,7 @@ class DBBookRepository(BaseBookRepository):
                         data["external"] = json.loads(data["external"])
                     except json.JSONDecodeError:
                         data["external"] = {}
-                result.append(Book(**data))
+                result.append(data)
 
             return result
 
@@ -88,7 +88,7 @@ class DBBookRepository(BaseBookRepository):
                 book.genre,
                 book.count_page,
                 book.accessibility,
-                book.external.model_dump_json(),
+                book.external.model_dump_json() if book.external else None,
             )
             book.id = new_id
             return book
@@ -130,7 +130,7 @@ class DBBookRepository(BaseBookRepository):
                 new_book.genre,
                 new_book.count_page,
                 new_book.accessibility,
-                new_book.external.model_dump_json(),
+                new_book.external.model_dump_json() if new_book.external else None,
                 new_book.id,
             )
         return new_book

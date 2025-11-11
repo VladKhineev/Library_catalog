@@ -1,50 +1,31 @@
-import loguru
-
-from src.models.book_model import Book
+from src.models.book_model import Book, BookCreateDTO, BookUpdateDTO
 from src.repositories.base_repository import BaseBookRepository
 
 
 class BookManager:
-    def __init__(self, repository: BaseBookRepository, logger=None):
+    def __init__(self, repository: BaseBookRepository):
         self.repository = repository
-        self.logger = logger or loguru.logger
 
     async def get_books(self):
-        self.logger.info("Get books")
-
         return await self.repository.get_books()
 
     async def add_book(self, book: Book):
-        self.logger.info( "Book create", extra={ "book_id": book.id, "title": book.title} )
+        new_book = await self.repository.add_book(book)
 
-        book = await self.repository.add_book(book)
-        self.logger.info( "✅ Book created", extra={ "book_id": book.id, "title": book.title} )
-        return book
+        return new_book
 
     async def get_book(self, book_id: int):
-        self.logger.info( "Get book", extra={ "book_id": book_id} )
-
         book = await self.repository.get_book(book_id)
-
-        self.logger.info( "✅ book received", extra={ "book_id": book.id, "title": book.title} )
 
         return book
 
-    async def update_book(self, new_book: Book):
-        self.logger.info( "Update book", extra={ "book_id": new_book.id} )
-
+    async def update_book(self, new_book: BookUpdateDTO):
         book = await self.repository.update_book(new_book)
-
-        self.logger.info( "✅ Updated book", extra={ "book_id": book.id, "title": book.title} )
 
         return book
 
     async def delete_book(self, book_id: int):
-        self.logger.info( "Delete book", extra={ "book_id": book_id} )
-
         book = await self.repository.delete_book(book_id)
-
-        self.logger.info( "✅ Deleted book", extra={ "book_id": book.id, "title": book.title} )
 
         return book
 

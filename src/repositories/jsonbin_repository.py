@@ -43,7 +43,7 @@ class JsonBinRepository(BaseBookRepository):
         self.url = f"{self.BASE_URL}/{bin_id}"
 
     @handle_error()
-    async def get_books(self) -> list[dict]:
+    async def get_books(self):
         async with httpx.AsyncClient() as client:
             response = await client.get(self.url, headers=self.headers)
             return response.json()['record']['bins']

@@ -15,7 +15,7 @@ class JsonBookRepository(BaseBookRepository):
         self.repo = JSONRepository('books.json')
 
     @handle_error()
-    async def get_books(self) -> list[dict]:
+    async def get_books(self):
         res = self.repo.load_data()
         return res
 
@@ -38,9 +38,7 @@ class JsonBookRepository(BaseBookRepository):
     async def update_book(self, new_book):
         deleted_book = await self.delete_book(new_book.id)
         if not deleted_book:
-            raise AttributeError(
-                f"Unable to update. Book '{new_book.id}' no found"
-            )
+            raise AttributeError(f"Unable to update. Book '{new_book.id}' no found")
         await self.add_book(new_book)
         return new_book
 
