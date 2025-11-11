@@ -27,10 +27,10 @@ class BookService:
             return 1
 
 
-    async def get_list_books(self) -> list[BookResponseDTO]:
+    async def get_list_books(self, offset: int, limit: int) -> list[BookResponseDTO]:
         self.logger.info("Get books")
-
-        return await self.manager.get_books()
+        books = await self.manager.get_books()
+        return books[offset:offset+limit]
 
     async def create_book(self, create_book: BookCreateDTO) -> BookResponseDTO:
         self.logger.info("Book create", extra={"title": create_book.title})

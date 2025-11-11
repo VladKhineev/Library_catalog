@@ -1,18 +1,7 @@
-from fastapi import APIRouter, Depends, status
-from loguru import logger
-
-from src.core.config import Settings, get_settings
+from fastapi import APIRouter, Depends, status, Query
 from src.core.decorators import handle_error
 from src.dependencies.dependencies import get_book_service
-from src.integrations.openlibrary_api import OpenLibraryAPI
-from src.managers.book_manager import BookManager
-from src.managers.enrichment_manager import BookEnrichmentManager
 from src.models.book_model import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
-from src.models.repo_model import Repo
-from src.repositories.base_repository import BaseBookRepository
-from src.repositories.db_repository import DBBookRepository
-from src.repositories.json_repository import JsonBookRepository
-from src.repositories.jsonbin_repository import JsonBinRepository
 from src.services.book_service import BookService
 
 router = APIRouter(prefix='/api/v1/books', tags=['Books'])
@@ -20,8 +9,11 @@ router = APIRouter(prefix='/api/v1/books', tags=['Books'])
 
 @handle_error(default_return=[], msg='Error getting a list of books')
 @router.get('/', response_model=list[Book], status_code=status.HTTP_200_OK)
-async def get_books(service: BookService = Depends(get_book_service)) -> list[BookResponseDTO]:
-    return await service.get_list_books()
+async def get_books(
+        offset: int = Query(0, ge=0),
+        limit: int = Query(10, ge=1, le=100),
+        service: BookService = Depends(get_book_service)) -> list[BookResponseDTO]:
+    return await service.get_list_books(offset=offset, limit=limit)
 
 
 @handle_error(default_return=[], msg='Error when adding a workbook')
