@@ -10,35 +10,42 @@ class BookManager:
         self.logger = logger or loguru.logger
 
     async def get_books(self):
-        self.logger.info("Получаем все книги")
+        self.logger.info("Get books")
 
         return await self.repository.get_books()
 
     async def add_book(self, book: Book):
-        self.logger.info(f"Добавляем книгу: {book.title}")
+        self.logger.info( "Book create", extra={ "book_id": book.id, "title": book.title} )
 
         book = await self.repository.add_book(book)
-        self.logger.info(f"✅ Книга '{book.title}' успешно добавлена.")
+        self.logger.info( "✅ Book created", extra={ "book_id": book.id, "title": book.title} )
         return book
 
     async def get_book(self, book_id: int):
-        self.logger.info(f"Получаем книгу ID={book_id}")
+        self.logger.info( "Get book", extra={ "book_id": book_id} )
 
         book = await self.repository.get_book(book_id)
+
+        self.logger.info( "✅ book received", extra={ "book_id": book.id, "title": book.title} )
+
         return book
 
     async def update_book(self, new_book: Book):
-        self.logger.info(f"Обновляем книгу ID={new_book.id}")
+        self.logger.info( "Update book", extra={ "book_id": new_book.id} )
 
         book = await self.repository.update_book(new_book)
-        self.logger.info(f"✅ Книга '{book.title}' успешно обновлена.")
+
+        self.logger.info( "✅ Updated book", extra={ "book_id": book.id, "title": book.title} )
+
         return book
 
     async def delete_book(self, book_id: int):
-        self.logger.info(f"Удаляем книгу ID={book_id}")
+        self.logger.info( "Delete book", extra={ "book_id": book_id} )
 
         book = await self.repository.delete_book(book_id)
-        self.logger.info(f"✅ Книга '{book.title}' успешно удалена.")
+
+        self.logger.info( "✅ Deleted book", extra={ "book_id": book.id, "title": book.title} )
+
         return book
 
 

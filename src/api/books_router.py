@@ -68,7 +68,7 @@ async def update_book(book: Book, manager: BookManager = Depends(get_book_manage
 
 
 @handle_error(default_return=[], msg='Error when deleting a book')
-@router.delete('/{book_id}', response_model=Book, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{book_id}', response_model=Book, status_code=status.HTTP_200_OK)
 async def delete_book(book_id: int, manager: BookManager = Depends(get_book_manager)) -> Book:
     return await manager.delete_book(book_id)
 

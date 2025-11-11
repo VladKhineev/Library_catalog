@@ -12,7 +12,7 @@ class JsonBookRepository(BaseBookRepository):
         super().__init__(logger_instance)
         self.logger.info("JSON ФАЙЛ")
 
-        self.repo = JSONRepository('../books.json')
+        self.repo = JSONRepository('books.json')
 
     @handle_error()
     async def get_books(self) -> list[dict]:
