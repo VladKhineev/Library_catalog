@@ -1,12 +1,13 @@
 from fastapi import Depends, Query
 from loguru import logger
 from src.core.config import Settings, get_settings
+from src.core.database import AsyncSessionLocal
 from src.integrations.base_api_client import BaseApiClient
 from src.integrations.openlibrary_api import OpenLibraryAPI
 from src.managers.book_manager import BookManager
 from src.managers.enrichment_manager import BookEnrichmentManager
-from src.models.book_model import Book
-from src.models.repo_model import Repo
+from src.schemas.book_model import Book
+from src.schemas.repo_model import Repo
 from src.repositories.base_repository import BaseBookRepository
 from src.repositories.db_repository import DBBookRepository
 from src.repositories.json_repository import JsonBookRepository
@@ -17,7 +18,7 @@ from src.services.book_service import BookService
 def choose_repository(source: Repo) -> BaseBookRepository:
     settings: Settings = get_settings()
     if source == Repo.POSTGRES:
-        repo = DBBookRepository(dsn=settings.POSTGRES_URL, logger_instance=logger)
+        repo = DBBookRepository(session_factory=AsyncSessionLocal, logger_instance=logger)
     elif source == Repo.JSON:
         repo = JsonBookRepository(logger)
     elif source == Repo.JSONBIN:

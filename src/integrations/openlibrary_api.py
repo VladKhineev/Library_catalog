@@ -1,7 +1,7 @@
 import httpx
 
 from src.integrations.base_api_client import BaseApiClient
-from src.models.book_model import BookExternalInfo
+from src.schemas.book_model import BookExternalInfo
 
 
 class OpenLibraryAPI(BaseApiClient):
