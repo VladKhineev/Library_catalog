@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, Query
 from src.core.decorators import handle_error
 from src.dependencies.dependencies import get_book_service
-from src.models.book_model import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
+from src.schemas.book_model import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
 from src.services.book_service import BookService
 
 router = APIRouter(prefix='/api/v1/books', tags=['Books'])

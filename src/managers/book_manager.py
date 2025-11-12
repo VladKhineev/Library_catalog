@@ -1,4 +1,4 @@
-from src.models.book_model import Book, BookCreateDTO, BookUpdateDTO
+from src.schemas.book_model import Book, BookCreateDTO, BookUpdateDTO
 from src.repositories.base_repository import BaseBookRepository
 
 

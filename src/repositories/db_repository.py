@@ -3,7 +3,7 @@ import json
 import asyncpg
 
 from src.core.decorators import handle_error
-from src.models.book_model import Book
+from src.schemas.book_model import Book
 from src.repositories.base_repository import BaseBookRepository
 
 

@@ -1,6 +1,6 @@
 from src.integrations.openlibrary_api import OpenLibraryAPI
 from src.managers.book_manager import BookManager
-from src.models.book_model import Book, BookCreateDTO, BookResponseDTO
+from src.schemas.book_model import Book, BookCreateDTO, BookResponseDTO
 
 
 class BookEnrichmentManager:

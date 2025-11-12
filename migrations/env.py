@@ -1,15 +1,15 @@
 # migrations/env.py
 
+import asyncio
 from logging.config import fileConfig
+
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from alembic import context
-import asyncio
 
 # ✅ Импортируем наш Base и модели, чтобы Alembic "видел" таблицы
 from src.core.database import Base
-from src.models.books_orm import BookORM  # важно импортировать, чтобы таблица не пропала из metadata
 
 # Alembic Config — объект, который содержит настройки из alembic.ini
 config = context.config
