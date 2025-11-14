@@ -97,26 +97,3 @@ class JsonBinRepository(BaseBookRepository):
         async with httpx.AsyncClient() as client:
             await client.put(self.url, json=res, headers=self.headers)
             return Book(**deleted_book)
-
-
-if __name__ == '__main__':
-    book = Book(
-        **{
-            "id": 543,
-            "title": "Sasha",
-            "author": "string",
-            "year": 100,
-            "genre": "string",
-            "count_page": 0,
-            "accessibility": "в наличии",
-        }
-    )
-
-    async def test():
-        js = JsonBinRepository(
-            '$2a$10$v/qfQsVRSLYVUUe7wBPp5ONexSDmwvuqchMBwBZzEDSJErk24DW4O',
-            '69008a2a43b1c97be986cdc7',
-        )
-        # res = await js.delete_book()
-        res = await js.add_book(book)
-        print(res)

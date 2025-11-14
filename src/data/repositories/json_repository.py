@@ -76,19 +76,3 @@ class JSONRepository:
             data = []
 
         return data
-
-
-if __name__ == '__main__':
-    book = Book(
-        **{
-            "id": 232,
-            "title": "string",
-            "author": "string",
-            "year": 1,
-            "genre": "string",
-            "count_page": 0,
-            "accessibility": "в наличии",
-        }
-    )
-    jb = JsonBookRepository()
-    jb.update_book(book)

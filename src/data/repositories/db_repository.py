@@ -61,17 +61,3 @@ class DBBookRepository(BaseBookRepository):
             await session.commit()
             return BookResponseDTO.model_validate(db_book.__dict__)
 
-
-if __name__ == '__main__':
-    repo = DBBookRepository(session_factory=AsyncSessionLocal)
-    print(repo.get_book(43242))
-    # book = Book(**{
-    #     "id": 5,
-    #     "title": "Dima",
-    #     "author": "string",
-    #     "year": 0,
-    #     "genre": "string",
-    #     "count_page": 100,
-    #     "accessibility": "в наличии"
-    # })
-    # print(repo.delete_book(5))
