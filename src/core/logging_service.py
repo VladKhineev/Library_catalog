@@ -1,6 +1,7 @@
-from loguru import logger
 import sys
 from pathlib import Path
+
+from loguru import logger
 
 
 class LoggerService:
@@ -13,22 +14,22 @@ class LoggerService:
             sys.stdout,
             colorize=True,
             format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-                   "<level>{level: <8}</level> | "
-                   "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-                   "<level>{message}</level>",
-            level="INFO"
+            "<level>{level: <8}</level> | "
+            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+            "<level>{message}</level>",
+            level="INFO",
         )
 
         # Лог-файл (с ротацией)
         log_path = Path(log_file)
         logger.add(
             log_path,
-            rotation="10 MB",        # создаёт новый файл каждые 10MB
-            retention="10 days",     # хранит 10 дней
-            compression="zip",       # архивирует старые логи
+            rotation="10 MB",  # создаёт новый файл каждые 10MB
+            retention="10 days",  # хранит 10 дней
+            compression="zip",  # архивирует старые логи
             encoding="utf-8",
             level="INFO",
-            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
         )
 
         self._logger = logger.bind(context=name)
@@ -51,12 +52,13 @@ class LoggerService:
     def get_logger(self):
         return self._logger
 
+
 if __name__ == '__main__':
 
     logger = LoggerService("BookRepository")
 
-    logger.info("Добавляем новую книгу")
+    logger.info("add new book")
     try:
-        raise ValueError("Ошибка при вставке")
+        raise ValueError("Insertion error")
     except Exception as e:
-        logger.error("Не удалось добавить книгу", e)
+        logger.error("Unable to add a book", e)

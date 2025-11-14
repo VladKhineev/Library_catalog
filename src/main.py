@@ -1,11 +1,10 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 import time
 
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+from src.api.routers.books_router import router as books_router
 from src.core.logging_service import LoggerService
-from src.api.books_router import router as books_router
-
-
 
 app = FastAPI(title='Books API')
 app.include_router(books_router)
@@ -24,10 +23,12 @@ async def log_requests(request, call_next):
     try:
         response = await call_next(request)
         process_time = (time.time() - start_time) * 1000
-        logger.info(f"📤 {request.method} {request.url} -> {response.status_code} ({process_time:.2f} ms)")
+        logger.info(
+            f"📤 {request.method} {request.url} -> {response.status_code} ({process_time:.2f} ms)"
+        )
         return response
     except Exception as e:
-        logger.exception(f"❌ Ошибка при обработке запроса: {e}")
+        logger.exception(f"❌ Request processing error: {e}")
         return JSONResponse(
             status_code=500,
             content={"detail": "Internal Server Error"},
@@ -37,13 +38,13 @@ async def log_requests(request, call_next):
 #  Глобальный перехват исключений FastAPI
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    logger.exception(f"🔥 Неперехваченное исключение: {exc}")
+    logger.exception(f"🔥 Uncaught exception: {exc}")
     return JSONResponse(
         status_code=500,
-        content={"detail": "Что-то пошло не так"},
+        content={"detail": "Something went wrong"},
     )
 
-@app.get("/")
-async def root():
-    logger.info("Запрос корневого эндпоинта")
-    return {"message": "Hello, Loguru!"}
+@app.get("/health", tags=['Health'])
+async def health_check():
+    """Health check эндпоинт."""
+    return {"status": "healthy"}
