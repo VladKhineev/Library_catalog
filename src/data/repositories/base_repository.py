@@ -5,7 +5,7 @@ from loguru import logger
 from src.api.schemas.book import Book, BookResponseDTO, BookUpdateDTO
 
 
-class BaseBookRepository(ABC):
+class BaseBookRepository[T: BookResponseDTO](ABC):
     """Абстрактный репозиторий для работы с книгами."""
 
     def __init__(self, logger_instance=None):
@@ -16,17 +16,17 @@ class BaseBookRepository(ABC):
         pass
 
     @abstractmethod
-    def add_book(self, book: Book) -> BookResponseDTO:
+    def add_book(self, book: Book) -> T:
         pass
 
     @abstractmethod
-    def get_book(self, book_id: int) -> BookResponseDTO:
+    def get_book(self, book_id: int) -> T:
         pass
 
     @abstractmethod
-    def update_book(self, new_book: BookUpdateDTO) -> BookResponseDTO:
+    def update_book(self, new_book: BookUpdateDTO) -> T:
         pass
 
     @abstractmethod
-    def delete_book(self, book_id: int) -> BookResponseDTO:
+    def delete_book(self, book_id: int) -> T:
         pass
