@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from loguru import logger
 
-from src.schemas.book_model import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
+from src.api.schemas.book import Book, BookResponseDTO, BookUpdateDTO
 
 
 class BaseBookRepository(ABC):

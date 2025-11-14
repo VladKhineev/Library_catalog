@@ -4,15 +4,14 @@ from src.core.config import Settings, get_settings
 from src.core.database import AsyncSessionLocal
 from src.integrations.base_api_client import BaseApiClient
 from src.integrations.openlibrary_api import OpenLibraryAPI
-from src.managers.book_manager import BookManager
-from src.managers.enrichment_manager import BookEnrichmentManager
-from src.schemas.book_model import Book
-from src.schemas.repo_model import Repo
-from src.repositories.base_repository import BaseBookRepository
-from src.repositories.db_repository import DBBookRepository
-from src.repositories.json_repository import JsonBookRepository
-from src.repositories.jsonbin_repository import JsonBinRepository
-from src.services.book_service import BookService
+from src.domain.managers.book_manager import BookManager
+from src.domain.managers.enrichment_manager import BookEnrichmentManager
+from src.api.schemas.repo import Repo
+from src.data.repositories.base_repository import BaseBookRepository
+from src.data.repositories.db_repository import DBBookRepository
+from src.data.repositories.json_repository import JsonBookRepository
+from src.data.repositories.jsonbin_repository import JsonBinRepository
+from src.domain.services.book_service import BookService
 
 
 def choose_repository(source: Repo) -> BaseBookRepository:

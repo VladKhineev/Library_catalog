@@ -1,5 +1,5 @@
-from src.schemas.book_model import Book, BookCreateDTO, BookUpdateDTO
-from src.repositories.base_repository import BaseBookRepository
+from src.api.schemas.book import Book, BookUpdateDTO
+from src.data.repositories.base_repository import BaseBookRepository
 
 
 class BookManager:

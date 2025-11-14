@@ -1,8 +1,8 @@
 from src.core.database import AsyncSessionLocal
 from src.core.decorators import handle_error
-from src.models.books_orm import BookORM
-from src.schemas.book_model import Book, BookResponseDTO
-from src.repositories.base_repository import BaseBookRepository
+from src.data.models.book import BookORM
+from src.api.schemas.book import Book, BookResponseDTO
+from src.data.repositories.base_repository import BaseBookRepository
 from sqlalchemy import select
 
 

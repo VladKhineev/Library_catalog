@@ -3,8 +3,8 @@ import os
 
 import src.core.exceptions as exception
 from src.core.decorators import handle_error
-from src.schemas.book_model import Book
-from src.repositories.base_repository import BaseBookRepository
+from src.api.schemas.book import Book
+from src.data.repositories.base_repository import BaseBookRepository
 
 
 class JsonBookRepository(BaseBookRepository):

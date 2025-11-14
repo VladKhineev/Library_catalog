@@ -1,8 +1,8 @@
 import loguru
-from src.managers.book_manager import BookManager
-from src.managers.enrichment_manager import BookEnrichmentManager
+from src.domain.managers.book_manager import BookManager
+from src.domain.managers.enrichment_manager import BookEnrichmentManager
 from src.integrations.base_api_client import BaseApiClient
-from src.schemas.book_model import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
+from src.api.schemas.book import Book, BookCreateDTO, BookResponseDTO, BookUpdateDTO
 
 class BookService:
     def __init__(

@@ -3,7 +3,7 @@ import time
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from src.api.books_router import router as books_router
+from src.api.routers.books_router import router as books_router
 from src.core.logging_service import LoggerService
 
 app = FastAPI(title='Books API')
@@ -43,3 +43,8 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={"detail": "Something went wrong"},
     )
+
+@app.get("/health", tags=['Health'])
+async def health_check():
+    """Health check эндпоинт."""
+    return {"status": "healthy"}
